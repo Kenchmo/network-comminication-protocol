@@ -14,35 +14,43 @@ extern msgq_t * msgq1, * msgq2;
 
 int client1_connected = 0;
 int client2_connected = 0;
-int notify_c1 = 0;
-int notify_c2 = 0;
+volatile int notify_c1 = 0;
+volatile int notify_c2 = 0;
 
 void *server_thread(void *threadarg){
     //initialize server
     this_server.msg.sender = NOTSET;
     this_server.msg.req_or_resp = NOTSET;
     this_server.msg.acked = NOTSET;
+    //int notified_flag = 0;
 
     //waiting for two clients to connect
-    while(1)
-        if(client1_connected && client2_connected) break;
+    while(1){
+        if(client1_connected && client2_connected){
+            cout<<"client 1 & 2 connected \n";
+            break;
+        }
+    }
     
     //start processing requests and responses
     while(1){
-        //if server has unacknowledged msg
-        if(!this_server.msg.acked){
-            this_server.lock.lock();
-            
-            if(this_server.msg.sender == C1){
-                notify_c2 = 1; //notify c2
-                while(!this_server.msg.acked){} // wait until c1 ack the msg
-            }
-            if(this_server.msg.sender == C2){
-                notify_c1 = 1; //notify c2
-                while(!this_server.msg.acked){} // wait until c2 ack the msg
-            }
-            this_server.lock.unlock();
-        }
+//        //if server has unacknowledged msg
+//        if(this_server.msg.acked == UNACKED && notified_flag == 0){
+//            this_server.lock.lock();
+//            if(this_server.msg.sender == C1){
+//                notify_c2 = 1; //notify c2
+//                cout<<"notified c2 \n";
+//                //wait until c2 put the notify flag down
+//                while(notify_c2){}
+//            }
+//            if(this_server.msg.sender == C2){
+//                cout<<"notifying c1 \n";
+//                notify_c1 = 1; //notify c2
+//                //wait until c1 put the notify flag down
+//                while(notify_c1){}
+//            }
+//            this_server.lock.unlock();
+//        }
     }
     //pthread_exit(NULL);
     return NULL;
@@ -60,12 +68,18 @@ void *server_thread(void *threadarg){
 void *client1_thread(void *threadarg) {
     msgq_t *msgq = (msgq_t *) threadarg;
     client1_connected = 1;
+    
+    while(1)
+        if(client1_connected && client2_connected)
+            break;
+    
     while(1){
+
+        this_server.lock.lock();
         
         /* see if there is msg for me */
         
-        if(notify_c1){
-            notify_c1 = 0;
+        if(this_server.msg.sender == C2 && this_server.msg.acked == UNACKED){
             
             // if the msg is a response, simply print it to screen
             if(this_server.msg.req_or_resp == RESP){
@@ -96,9 +110,9 @@ void *client1_thread(void *threadarg) {
             else if(this_server.msg.req_or_resp == REQ){
                 
                 if(this_server.msg.type == IDTYPE)
-                    cout<<"CLIENT 1 RECEIVED ID REQ FROM CLIENT 2: ";
+                    cout<<"CLIENT 1 RECEIVED ID REQ FROM CLIENT 2 \n";
                 else if(this_server.msg.type == HASHTYPE)
-                    cout<<"CLIENT 1 RECEIVED HASH REQ FROM CLIENT 2: ";
+                    cout<<"CLIENT 1 RECEIVED HASH REQ FROM CLIENT 2 \n";
                 msg_t msgtemp = this_server.msg;
                 msgtemp.data = malloc(this_server.msg.datalen);
                 memcpy(msgtemp.data, this_server.msg.data, this_server.msg.datalen);
@@ -107,16 +121,18 @@ void *client1_thread(void *threadarg) {
                 msgq->q.push(msgtemp);
                 msgq->lock.unlock();
             }
+            
             this_server.msg.acked = ACKED;
         }
         
         /* if there is no msg for me , see if I need to send msg */
+        
         else{
-            this_server.lock.lock();            // lock the server msg
-            if(this_server.msg.acked == ACKED){
+            if(this_server.msg.acked == ACKED || this_server.msg.acked == NOTSET){
+                
                 msgq->lock.lock();              //lock the msg queue
+                
                 if(msgq->q.size() != 0 && msgq->q.front().sender == C1){
-                    
                     if(this_server.msg.datatype ==INTARR)
                         delete[] (int*)this_server.msg.data;
                     if(this_server.msg.datatype ==CHARARR)
@@ -129,8 +145,8 @@ void *client1_thread(void *threadarg) {
                 }
                 msgq->lock.unlock();
             }
-            this_server.lock.unlock();
         }
+        this_server.lock.unlock();
     }
     //pthread_exit(NULL);
     return NULL;
@@ -148,12 +164,19 @@ void *client1_thread(void *threadarg) {
 void *client2_thread(void *threadarg){
     msgq_t *msgq = (msgq_t *) threadarg;
     client2_connected = 1;
+    
+    while(1)
+        if(client1_connected && client2_connected)
+            break;
+
+    
     while(1){
+        
+        this_server.lock.lock();
         
         /* see if there is msg for me */
         
-        if(notify_c1){
-            notify_c1 = 0;
+        if(this_server.msg.sender == C1 && this_server.msg.acked == UNACKED){
             
             // if the msg is a response, simply print it to screen
             if(this_server.msg.req_or_resp == RESP){
@@ -184,9 +207,9 @@ void *client2_thread(void *threadarg){
             else if(this_server.msg.req_or_resp == REQ){
                 
                 if(this_server.msg.type == IDTYPE)
-                    cout<<"CLIENT 1 RECEIVED ID REQ FROM CLIENT 2: ";
+                    cout<<"CLIENT 2 RECEIVED ID REQ FROM CLIENT 1 \n";
                 else if(this_server.msg.type == HASHTYPE)
-                    cout<<"CLIENT 1 RECEIVED HASH REQ FROM CLIENT 2: ";
+                    cout<<"CLIENT 2 RECEIVED HASH REQ FROM CLIENT 1 \n";
                 msg_t msgtemp = this_server.msg;
                 msgtemp.data = malloc(this_server.msg.datalen);
                 memcpy(msgtemp.data, this_server.msg.data, this_server.msg.datalen);
@@ -195,16 +218,18 @@ void *client2_thread(void *threadarg){
                 msgq->q.push(msgtemp);
                 msgq->lock.unlock();
             }
+            
             this_server.msg.acked = ACKED;
         }
         
         /* if there is no msg for me , see if I need to send msg */
+        
         else{
-            this_server.lock.lock();            // lock the server msg
-            if(this_server.msg.acked == ACKED){
+            if(this_server.msg.acked == ACKED || this_server.msg.acked == NOTSET){
+                
                 msgq->lock.lock();              //lock the msg queue
-                if(msgq->q.size() != 0 && msgq->q.front().sender == C1){
-                    
+                
+                if(msgq->q.size() != 0 && msgq->q.front().sender == C2){
                     if(this_server.msg.datatype ==INTARR)
                         delete[] (int*)this_server.msg.data;
                     if(this_server.msg.datatype ==CHARARR)
@@ -213,15 +238,16 @@ void *client2_thread(void *threadarg){
                     this_server.msg.data = malloc(this_server.msg.datalen);
                     memcpy(this_server.msg.data, msgq->q.front().data, this_server.msg.datalen);
                     msgq->q.pop();
-                           
+                    
                 }
                 msgq->lock.unlock();
             }
-            this_server.lock.unlock();
         }
+        this_server.lock.unlock();
     }
     //pthread_exit(NULL);
     return NULL;
+
 }
 
 
@@ -307,7 +333,7 @@ void *user2_thread(void *threadarg){
         //if there is a request to solve, work on it
         if(solving_flag){
             //solve msgtemp, put result to msgtemp
-            msgtemp.sender = C1;
+            msgtemp.sender = C2;
             msgtemp.req_or_resp = RESP;
             msgtemp.acked = UNACKED;
             if(msgtemp.type == IDTYPE){
@@ -329,7 +355,7 @@ void *user2_thread(void *threadarg){
             msgq->lock.lock();
             // if the queue front is a request from peer
             // copy the request to local
-            if(msgq->q.front().req_or_resp == REQ && msgq->q.front().sender == C2){
+            if(msgq->q.front().req_or_resp == REQ && msgq->q.front().sender == C1){
                 if(msgtemp.datatype == INTARR)
                     delete[] (int*)msgtemp.data;
                 if(msgtemp.datatype == CHARARR)

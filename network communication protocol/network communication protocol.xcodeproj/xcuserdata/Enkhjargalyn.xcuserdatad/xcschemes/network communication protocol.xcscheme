@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6D386C431E5905CC001CADF3"
+               BlueprintIdentifier = "6DF4BB0E1E5A3A9A0014AA8D"
                BuildableName = "network communication protocol"
                BlueprintName = "network communication protocol"
                ReferencedContainer = "container:network communication protocol.xcodeproj">
@@ -32,7 +32,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6D386C431E5905CC001CADF3"
+            BlueprintIdentifier = "6DF4BB0E1E5A3A9A0014AA8D"
             BuildableName = "network communication protocol"
             BlueprintName = "network communication protocol"
             ReferencedContainer = "container:network communication protocol.xcodeproj">
@@ -55,7 +55,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6D386C431E5905CC001CADF3"
+            BlueprintIdentifier = "6DF4BB0E1E5A3A9A0014AA8D"
             BuildableName = "network communication protocol"
             BlueprintName = "network communication protocol"
             ReferencedContainer = "container:network communication protocol.xcodeproj">
@@ -74,7 +74,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6D386C431E5905CC001CADF3"
+            BlueprintIdentifier = "6DF4BB0E1E5A3A9A0014AA8D"
             BuildableName = "network communication protocol"
             BlueprintName = "network communication protocol"
             ReferencedContainer = "container:network communication protocol.xcodeproj">

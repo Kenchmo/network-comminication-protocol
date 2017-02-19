@@ -24,7 +24,6 @@ int main () {
     tempmsg.acked = UNACKED;
     tempmsg.type = IDTYPE;
     msgq1->q.push(tempmsg);
-    
     tempmsg.sender = C2;
     tempmsg.req_or_resp = REQ;
     tempmsg.acked = UNACKED;
@@ -42,7 +41,6 @@ int main () {
         exit(-1);
     }
     
-    sleep(2);
     cout <<"main() : creating client1 thread " << endl;
     rc = pthread_create(&client1_trd, NULL, client1_thread, (void *)msgq1);
     if (rc){

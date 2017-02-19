@@ -25,8 +25,6 @@
 using namespace std;
 
 
-#define LOCKED 1
-#define UNLOCKED 0
 
 #define NOTSET -1
 
@@ -35,22 +33,22 @@ using namespace std;
 #define RESP 1
 
 // rtype and ttype
-#define IDTYPE 1
-#define HASHTYPE 2
+#define IDTYPE 3
+#define HASHTYPE 4
 
 // sender
 
-#define C1  1
-#define C2 2
+#define C1 5
+#define C2 6
 
 //acknowledged or not
-#define ACKED 1
-#define UNACKED 0
+#define ACKED 7
+#define UNACKED 8
 
 //datatype
 
-#define INTARR 1
-#define CHARARR 2
+#define INTARR 9
+#define CHARARR 10
 
 
 

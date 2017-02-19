@@ -9,13 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "network communication protocol/main.cpp"
-            timestampString = "509176415.735876"
+            filePath = "thrds.cpp"
+            timestampString = "509234734.643839"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "100"
-            endingLineNumber = "100"
-            landmarkName = "main ()"
+            startingLineNumber = "76"
+            endingLineNumber = "76"
+            landmarkName = "client1_thread(void *threadarg)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -26,12 +26,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "thrds.cpp"
-            timestampString = "509175253.886879"
+            timestampString = "509234734.643839"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "201"
-            endingLineNumber = "201"
-            landmarkName = "user1_thread(void *threadarg)"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
+            landmarkName = "client1_thread(void *threadarg)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
