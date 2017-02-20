@@ -17,41 +17,41 @@ int client2_connected = 0;
 volatile int notify_c1 = 0;
 volatile int notify_c2 = 0;
 
-void *server_thread(void *threadarg){
-    //initialize Server_class
-    //int notified_flag = 0;
-
-    //waiting for two clients to connect
-    while(1){
-        if(client1_connected && client2_connected){
-            cout<<"client 1 & 2 connected \n";
-            break;
-        }
-    }
-    
-    //start processing requests and responses
-    while(1){
-//        //if Server_class has unacknowledged msg
-//        if(this_server.msg.acked == UNACKED && notified_flag == 0){
-//            this_server.lock.lock();
-//            if(this_server.msg.sender == C1){
-//                notify_c2 = 1; //notify c2
-//                cout<<"notified c2 \n";
-//                //wait until c2 put the notify flag down
-//                while(notify_c2){}
-//            }
-//            if(this_server.msg.sender == C2){
-//                cout<<"notifying c1 \n";
-//                notify_c1 = 1; //notify c2
-//                //wait until c1 put the notify flag down
-//                while(notify_c1){}
-//            }
-//            this_server.lock.unlock();
+//void *server_thread(void *threadarg){
+//    //initialize Server_class
+//    //int notified_flag = 0;
+//
+//    //waiting for two clients to connect
+//    while(1){
+//        if(client1_connected && client2_connected){
+//            //cout<<"client 1 & 2 connected \n";
+//            break;
 //        }
-    }
-    //pthread_exit(NULL);
-    return NULL;
-}
+//    }
+//    
+//    //start processing requests and responses
+//    while(1){
+////        //if Server_class has unacknowledged msg
+////        if(this_server.msg.acked == UNACKED && notified_flag == 0){
+////            this_server.lock.lock();
+////            if(this_server.msg.sender == C1){
+////                notify_c2 = 1; //notify c2
+////                cout<<"notified c2 \n";
+////                //wait until c2 put the notify flag down
+////                while(notify_c2){}
+////            }
+////            if(this_server.msg.sender == C2){
+////                cout<<"notifying c1 \n";
+////                notify_c1 = 1; //notify c2
+////                //wait until c1 put the notify flag down
+////                while(notify_c1){}
+////            }
+////            this_server.lock.unlock();
+////        }
+//    }
+//    //pthread_exit(NULL);
+//    return NULL;
+//}
 
 
 
@@ -96,9 +96,8 @@ void *client1_thread(void *threadarg) {
                     cout<<"CLIENT 1 RECEIVED ID REQ FROM CLIENT 2 \n";
                 else if(this_server.msg.top().type == HASHTYPE)
                     cout<<"CLIENT 1 RECEIVED HASH REQ FROM CLIENT 2 \n";
-                Msg msgtemp = this_server.msg.top();
                 msgq->lock.lock();
-                msgq->q.push(msgtemp);
+                msgq->q.push_back((this_server.msg.top()));
                 msgq->lock.unlock();
             }
             
@@ -112,9 +111,9 @@ void *client1_thread(void *threadarg) {
                 
                 msgq->lock.lock();              //lock the msg queue
                 
-                if(msgq->q.size() != 0 && msgq->q.front().sender == C1){
-                    this_server.msg.push(msgq->q.front());
-                    msgq->q.pop();
+                if(msgq->q.size() != 0 && msgq->q[msgq->count].sender == C1){
+                    this_server.msg.push(msgq->q[msgq->count]);
+                    msgq->count++;
                 }
                 msgq->lock.unlock();
             }
@@ -168,9 +167,8 @@ void *client2_thread(void *threadarg){
                     cout<<"CLIENT 2 RECEIVED ID REQ FROM CLIENT 1 \n";
                 else if(this_server.msg.top().type == HASHTYPE)
                     cout<<"CLIENT 2 RECEIVED HASH REQ FROM CLIENT 1 \n";
-                Msg msgtemp = this_server.msg.top();
                 msgq->lock.lock();
-                msgq->q.push(msgtemp);
+                msgq->q.push_back((this_server.msg.top()));
                 msgq->lock.unlock();
             }
             
@@ -183,9 +181,9 @@ void *client2_thread(void *threadarg){
             if(this_server.msg.empty() || (this_server.msg.top().acked == ACKED || this_server.msg.top().acked == NOTSET)){
                 
                 msgq->lock.lock();              //lock the msg queue
-                if(msgq->q.size() != 0 && msgq->q.front().sender == C2){
-                    this_server.msg.push(msgq->q.front());
-                    msgq->q.pop();
+                if(msgq->q.size() != 0 && msgq->q[msgq->count].sender == C2){
+                    this_server.msg.push(msgq->q[msgq->count]);
+                    msgq->count++;
                 }
                 msgq->lock.unlock();
             }
@@ -199,14 +197,11 @@ void *client2_thread(void *threadarg){
 }
 
 
-// the user thread is quivalent to computers on the two ends
 void *user1_thread(void *threadarg){
     Msgq *msgq = (Msgq *) threadarg;
     int solving_flag = 0;
-    Msg msgtemp;
-    msgtemp.datatype = NOTSET;
+    stack<Msg> msgtemp;
     
-    int8_t idtype = INTARR;
     int idlen = 5*sizeof(int);
     int * id = (int *)malloc(idlen);
     id[0] = 15;
@@ -219,21 +214,26 @@ void *user1_thread(void *threadarg){
         //if there is a request to solve, work on it
         if(solving_flag){
             //solve msgtemp, put result to msgtemp
-            msgtemp.sender = C1;
-            msgtemp.req_or_resp = RESP;
-            msgtemp.acked = UNACKED;
-            if(msgtemp.type == IDTYPE){
-                if(msgtemp.data) free(msgtemp.data);
-                msgtemp.data = malloc(idlen);
-                memcpy(msgtemp.data, id, idlen);
-                msgtemp.datalen = idlen;
-                msgtemp.datatype = idtype;
+            msgtemp.top().sender = C1;
+            msgtemp.top().req_or_resp = RESP;
+            msgtemp.top().acked = UNACKED;
+            if(msgtemp.top().type == IDTYPE){
+                if(msgtemp.top().data) free(msgtemp.top().data);
+                msgtemp.top().data = malloc(idlen);
+                memcpy(msgtemp.top().data, id, idlen);
+                msgtemp.top().datalen = idlen;
+                msgtemp.top().datatype = INTARR;
             }
-            else if(msgtemp.type == HASHTYPE){
-                msgtemp.data = hash_func(msgtemp.data, msgtemp.datatype);
+            else if(msgtemp.top().type == HASHTYPE){
+                void * temp = malloc(msgtemp.top().datalen);
+                memcpy(temp, msgtemp.top().data, msgtemp.top().datalen);
+                free(msgtemp.top().data);
+                *((int*)msgtemp.top().data) = hash_func(temp, msgtemp.top().datatype, msgtemp.top().hashtype);
+                msgtemp.top().datalen = sizeof(int);
+                msgtemp.top().datatype = INTARR;
             }
             msgq->lock.lock();
-            msgq->q.push(msgtemp);
+            msgq->q.push_back(msgtemp.top());
             msgq->lock.unlock();
             solving_flag = 0;
         }
@@ -241,9 +241,9 @@ void *user1_thread(void *threadarg){
             msgq->lock.lock();
             // if the queue front is a request from peer
             // copy the request to local
-            if(msgq->q.front().req_or_resp == REQ && msgq->q.front().sender == C2){
-                msgtemp = msgq->q.front();
-                msgq->q.pop();
+            if(msgq->q[msgq->count].req_or_resp == REQ && msgq->q[msgq->count].sender == C2){
+                msgtemp.push(msgq->q[msgq->count]);
+                msgq->count++;
                 solving_flag = 1;
             }
             msgq->lock.unlock();
@@ -259,8 +259,7 @@ void *user2_thread(void *threadarg){
     
     Msgq *msgq = (Msgq *) threadarg;
     int solving_flag = 0;
-    Msg msgtemp;
-    msgtemp.datatype = NOTSET;
+    stack<Msg> msgtemp;
     
     int idlen = 5 * sizeof(int);
     int * id = (int *)malloc(idlen);
@@ -274,21 +273,26 @@ void *user2_thread(void *threadarg){
         //if there is a request to solve, work on it
         if(solving_flag){
             //solve msgtemp, put result to msgtemp
-            msgtemp.sender = C2;
-            msgtemp.req_or_resp = RESP;
-            msgtemp.acked = UNACKED;
-            if(msgtemp.type == IDTYPE){
-                if(msgtemp.data) free(msgtemp.data);
-                msgtemp.data = malloc(idlen);
-                memcpy(msgtemp.data, id, idlen);
-                msgtemp.datalen = idlen;
-                msgtemp.datatype = INTARR;
+            msgtemp.top().sender = C2;
+            msgtemp.top().req_or_resp = RESP;
+            msgtemp.top().acked = UNACKED;
+            if(msgtemp.top().type == IDTYPE){
+                if(msgtemp.top().data) free(msgtemp.top().data);
+                msgtemp.top().data = malloc(idlen);
+                memcpy(msgtemp.top().data, id, idlen);
+                msgtemp.top().datalen = idlen;
+                msgtemp.top().datatype = INTARR;
             }
-            else if(msgtemp.type == HASHTYPE){
-                msgtemp.data = hash_func(msgtemp.data, msgtemp.datatype);
+            else if(msgtemp.top().type == HASHTYPE){
+                void * temp = malloc(msgtemp.top().datalen);
+                memcpy(temp, msgtemp.top().data, msgtemp.top().datalen);
+                free(msgtemp.top().data);
+                *((int*)msgtemp.top().data) = hash_func(temp, msgtemp.top().datatype, msgtemp.top().hashtype);
+                msgtemp.top().datalen = sizeof(int);
+                msgtemp.top().datatype = INTARR;
             }
             msgq->lock.lock();
-            msgq->q.push(msgtemp);
+            msgq->q.push_back(msgtemp.top());
             msgq->lock.unlock();
             solving_flag = 0;
         }
@@ -296,9 +300,9 @@ void *user2_thread(void *threadarg){
             msgq->lock.lock();
             // if the queue front is a request from peer
             // copy the request to local
-            if(msgq->q.front().req_or_resp == REQ && msgq->q.front().sender == C1){
-                msgtemp = msgq->q.front();
-                msgq->q.pop();
+            if(msgq->q[msgq->count].req_or_resp == REQ && msgq->q[msgq->count].sender == C1){
+                msgtemp.push(msgq->q[msgq->count]);
+                msgq->count++;
                 solving_flag = 1;
             }
             msgq->lock.unlock();

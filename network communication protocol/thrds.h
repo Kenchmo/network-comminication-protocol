@@ -23,6 +23,7 @@
 
 #include "spinlock.h"
 #include "sleep.h"
+#include "hash.h"
 using namespace std;
 
 
@@ -62,7 +63,7 @@ public:
     void * data;
     size_t datalen;
     int8_t datatype;
-    
+    int8_t hashtype;
     Msg(){
         sender = NOTSET;
         req_or_resp = NOTSET;
@@ -71,6 +72,7 @@ public:
         data = NULL;
         datalen = 0;
         datatype = NOTSET;
+        hashtype = NOTSET;
     };
     ~Msg(){
         if(data != NULL)
@@ -118,8 +120,12 @@ public:
 
 class Msgq{
 public:
-    queue<Msg> q;
+    vector<Msg> q;
+    int count;
     spinlock lock;
+    Msgq(){
+        count = 0;
+    }
 };
 
 

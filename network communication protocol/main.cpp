@@ -36,8 +36,8 @@ int main () {
     tempmsg2.data = malloc(sizeof(int));
     tempmsg2.datalen = sizeof(int);
     
-    msgq1->q.push(tempmsg1);
-    //msgq1->q.push(tempmsg2);
+    msgq1->q.push_back(tempmsg1);
+    msgq1->q.push_back(tempmsg2);
     //msgq1->q.push(&tempmsg3);
     //msgq1->q.push(&tempmsg4);
     
@@ -58,18 +58,23 @@ int main () {
     tempmsg.acked = UNACKED;
     tempmsg.type = IDTYPE;
     tempmsg.data = NULL;
-    msgq2->q.push(tempmsg);
+    tempmsg.hashtype = HASHING2;
+    msgq2->q.push_back(tempmsg);
     
 
 
     int rc;
     
-    cout <<"main() : creating Server_class thread " << endl;
-    rc = pthread_create(&server_trd, NULL, server_thread, (void *)NULL);
-    if (rc){
-        cout << "Error: unable to create thread," << rc << endl;
-        exit(-1);
-    }
+//    /*server thread */
+//    
+//    cout <<"main() : creating Server_class thread " << endl;
+//    rc = pthread_create(&server_trd, NULL, server_thread, (void *)NULL);
+//    if (rc){
+//        cout << "Error: unable to create thread," << rc << endl;
+//        exit(-1);
+//    }
+    
+    /*network client threads */
     
     sleep(2);
     cout <<"main() : creating client1 thread " << endl;
@@ -86,6 +91,7 @@ int main () {
         exit(-1);
     }
     
+    /* human threads */
     cout <<"main() : creating user1 thread " << endl;
     rc = pthread_create(&user1_trd, NULL, user1_thread, (void *)msgq1);
     if (rc){
@@ -99,6 +105,8 @@ int main () {
         cout << "Error: unable to create thread," << rc << endl;
         exit(-1);
     }
+    
+    
     
     
     pthread_exit(NULL);
