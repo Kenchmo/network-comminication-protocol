@@ -52,7 +52,8 @@ using namespace std;
 
 
 
-typedef struct msg{
+class Msg{
+public:
     int8_t sender;
     int8_t req_or_resp;
     int8_t acked;
@@ -60,19 +61,83 @@ typedef struct msg{
     void * data;
     size_t datalen;
     int8_t datatype;
-} msg_t;
+    
+    Msg(){
+        sender = NOTSET;
+        req_or_resp = NOTSET;
+        acked = NOTSET;
+        type = NOTSET;
+        data = NULL;
+        datalen = 0;
+        datatype = NOTSET;
+    };
+    ~Msg(){
+        if(data != NULL) free(data);
+        data = NULL;
+    };
+    
+    Msg & operator= (const Msg & other){
+        sender = other.sender;
+        req_or_resp = other.req_or_resp;
+        acked = other.acked;
+        type = other.type;
+        if(data != NULL){
+            free(data);
+            data = NULL;
+        }
+        if(other.data != NULL){
+            data = malloc(other.datalen);
+            datalen = other.datalen;
+            memcpy(data, other.data, datalen);
+            datatype = other.datatype;
+        }
+        else{
+            data = NULL;
+            datalen = 0;
+            datatype = NOTSET;
+        }
+        return *this;
+    };
+    
+    void print_data(){
+        if(datatype == INTARR){
+            for(int i = 0; i < datalen / sizeof(int); i++)
+                cout<<((int*)data)[i]<<" ";
+            cout<<endl;
+        }
+        if(datatype == CHARARR){
+            for(int i = 0; i < datalen / sizeof(char); i++)
+                cout<<((char*)data)[i]<<" ";
+            cout<<endl;
+        }
+    };
+};
 
 
-typedef struct msgq{
-    queue<msg_t> q;
+class Msgq{
+public:
+    queue<Msg> q;
     spinlock lock;
-} msgq_t;
+};
 
 
-typedef struct server{
+class Server_class{
+public:
+    
     spinlock lock;
-    msg_t msg;
-}server_t;
+    Msg msg;
+    
+    Server_class(){};
+    ~Server_class(){
+        if(msg.data != NULL) free(msg.data);
+    };
+    Server_class & operator= (const Server_class & other){
+        msg = other.msg;
+        return *this;
+    };
+    
+
+};
 
 
 

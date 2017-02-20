@@ -9,8 +9,8 @@
 #include "hash.h"
 using namespace std;
 
-extern server_t this_server;
-extern msgq_t * msgq1, * msgq2;
+extern Server_class this_server;
+extern Msgq * msgq1, * msgq2;
 
 int client1_connected = 0;
 int client2_connected = 0;
@@ -18,7 +18,7 @@ volatile int notify_c1 = 0;
 volatile int notify_c2 = 0;
 
 void *server_thread(void *threadarg){
-    //initialize server
+    //initialize Server_class
     this_server.msg.sender = NOTSET;
     this_server.msg.req_or_resp = NOTSET;
     this_server.msg.acked = NOTSET;
@@ -34,7 +34,7 @@ void *server_thread(void *threadarg){
     
     //start processing requests and responses
     while(1){
-//        //if server has unacknowledged msg
+//        //if Server_class has unacknowledged msg
 //        if(this_server.msg.acked == UNACKED && notified_flag == 0){
 //            this_server.lock.lock();
 //            if(this_server.msg.sender == C1){
@@ -60,13 +60,13 @@ void *server_thread(void *threadarg){
 
 /**
  * INPUT: void* threadarg, the task queue
- * EFFECTS: sending the task to the other client through the server
+ * EFFECTS: sending the task to the other client through the Server_class
  *          receiving the response from the other client through the sever
  *
  *
  **/
 void *client1_thread(void *threadarg) {
-    msgq_t *msgq = (msgq_t *) threadarg;
+    Msgq *msgq = (Msgq *) threadarg;
     client1_connected = 1;
     
     while(1)
@@ -87,21 +87,7 @@ void *client1_thread(void *threadarg) {
                     cout<<"CLIENT 2 RESP ID TO CLIENT 1: ";
                 else if(this_server.msg.type == HASHTYPE)
                     cout<<"CLIENT 2 RESP HASH RESULT: ";
-                
-                if(this_server.msg.datatype == INTARR){
-                    size_t len = this_server.msg.datalen;
-                    int * temp = (int*)this_server.msg.data;
-                    for(size_t i =0 ; i < len; i++)
-                        cout<<temp[i]<<" ";
-                    cout<<endl;
-                }
-                else if(this_server.msg.datatype == CHARARR){
-                    size_t len = this_server.msg.datalen;
-                    char * temp = (char*)this_server.msg.data;
-                    for(size_t i =0 ; i < len; i++)
-                        cout<<temp[i]<<" ";
-                    cout<<endl;
-                }
+                this_server.msg.print_data();
             }
             
             // if the msg is a request,
@@ -113,10 +99,7 @@ void *client1_thread(void *threadarg) {
                     cout<<"CLIENT 1 RECEIVED ID REQ FROM CLIENT 2 \n";
                 else if(this_server.msg.type == HASHTYPE)
                     cout<<"CLIENT 1 RECEIVED HASH REQ FROM CLIENT 2 \n";
-                msg_t msgtemp = this_server.msg;
-                msgtemp.data = malloc(this_server.msg.datalen);
-                memcpy(msgtemp.data, this_server.msg.data, this_server.msg.datalen);
-
+                Msg msgtemp = this_server.msg;
                 msgq->lock.lock();
                 msgq->q.push(msgtemp);
                 msgq->lock.unlock();
@@ -133,15 +116,8 @@ void *client1_thread(void *threadarg) {
                 msgq->lock.lock();              //lock the msg queue
                 
                 if(msgq->q.size() != 0 && msgq->q.front().sender == C1){
-                    if(this_server.msg.datatype ==INTARR)
-                        delete[] (int*)this_server.msg.data;
-                    if(this_server.msg.datatype ==CHARARR)
-                        delete[] (char*)this_server.msg.data;
                     this_server.msg = msgq->q.front();
-                    this_server.msg.data = malloc(this_server.msg.datalen);
-                    memcpy(this_server.msg.data, msgq->q.front().data, this_server.msg.datalen);
                     msgq->q.pop();
-                
                 }
                 msgq->lock.unlock();
             }
@@ -156,19 +132,18 @@ void *client1_thread(void *threadarg) {
 
 /**
  * INPUT: void* threadarg, the task queue
- * EFFECTS: sending the task to the other client through the server
+ * EFFECTS: sending the task to the other client through the Server_class
  *          receiving the response from the other client through the sever
  *
  *
  **/
 void *client2_thread(void *threadarg){
-    msgq_t *msgq = (msgq_t *) threadarg;
+    Msgq *msgq = (Msgq *) threadarg;
     client2_connected = 1;
     
     while(1)
         if(client1_connected && client2_connected)
             break;
-
     
     while(1){
         
@@ -184,21 +159,7 @@ void *client2_thread(void *threadarg){
                     cout<<"CLIENT 1 RESP ID TO CLIENT 2: ";
                 else if(this_server.msg.type == HASHTYPE)
                     cout<<"CLIENT 1 RESP HASH RESULT: ";
-                
-                if(this_server.msg.datatype == INTARR){
-                    size_t len = this_server.msg.datalen;
-                    int * temp = (int*)this_server.msg.data;
-                    for(size_t i =0 ; i < len; i++)
-                        cout<<temp[i]<<" ";
-                    cout<<endl;
-                }
-                else if(this_server.msg.datatype == CHARARR){
-                    size_t len = this_server.msg.datalen;
-                    char * temp = (char*)this_server.msg.data;
-                    for(size_t i =0 ; i < len; i++)
-                        cout<<temp[i]<<" ";
-                    cout<<endl;
-                }
+                this_server.msg.print_data();
             }
             
             // if the msg is a request,
@@ -210,10 +171,7 @@ void *client2_thread(void *threadarg){
                     cout<<"CLIENT 2 RECEIVED ID REQ FROM CLIENT 1 \n";
                 else if(this_server.msg.type == HASHTYPE)
                     cout<<"CLIENT 2 RECEIVED HASH REQ FROM CLIENT 1 \n";
-                msg_t msgtemp = this_server.msg;
-                msgtemp.data = malloc(this_server.msg.datalen);
-                memcpy(msgtemp.data, this_server.msg.data, this_server.msg.datalen);
-                
+                Msg msgtemp = this_server.msg;
                 msgq->lock.lock();
                 msgq->q.push(msgtemp);
                 msgq->lock.unlock();
@@ -230,15 +188,8 @@ void *client2_thread(void *threadarg){
                 msgq->lock.lock();              //lock the msg queue
                 
                 if(msgq->q.size() != 0 && msgq->q.front().sender == C2){
-                    if(this_server.msg.datatype ==INTARR)
-                        delete[] (int*)this_server.msg.data;
-                    if(this_server.msg.datatype ==CHARARR)
-                        delete[] (char*)this_server.msg.data;
                     this_server.msg = msgq->q.front();
-                    this_server.msg.data = malloc(this_server.msg.datalen);
-                    memcpy(this_server.msg.data, msgq->q.front().data, this_server.msg.datalen);
                     msgq->q.pop();
-                    
                 }
                 msgq->lock.unlock();
             }
@@ -248,18 +199,19 @@ void *client2_thread(void *threadarg){
     //pthread_exit(NULL);
     return NULL;
 
+
 }
 
 
 // the user thread is quivalent to computers on the two ends
 void *user1_thread(void *threadarg){
-    msgq_t *msgq = (msgq_t *) threadarg;
+    Msgq *msgq = (Msgq *) threadarg;
     int solving_flag = 0;
-    msg_t msgtemp;
+    Msg msgtemp;
     msgtemp.datatype = NOTSET;
     
     int8_t idtype = INTARR;
-    int idlen = 5;
+    int idlen = 5*sizeof(int);
     int * id = (int *)malloc(idlen);
     id[0] = 15;
     id[1] = 30;
@@ -275,7 +227,7 @@ void *user1_thread(void *threadarg){
             msgtemp.req_or_resp = RESP;
             msgtemp.acked = UNACKED;
             if(msgtemp.type == IDTYPE){
-                if(msgtemp.data) delete[] (int*)msgtemp.data;
+                if(msgtemp.data) free(msgtemp.data);
                 msgtemp.data = malloc(idlen);
                 memcpy(msgtemp.data, id, idlen);
                 msgtemp.datalen = idlen;
@@ -294,13 +246,7 @@ void *user1_thread(void *threadarg){
             // if the queue front is a request from peer
             // copy the request to local
             if(msgq->q.front().req_or_resp == REQ && msgq->q.front().sender == C2){
-                if(msgtemp.datatype == INTARR)
-                    delete[] (int*)msgtemp.data;
-                if(msgtemp.datatype == CHARARR)
-                    delete[] (char*)msgtemp.data;
                 msgtemp = msgq->q.front();
-                msgtemp.data = malloc(msgtemp.datalen);
-                memcpy(msgtemp.data, msgq->q.front().data, msgtemp.datalen);
                 msgq->q.pop();
                 solving_flag = 1;
             }
@@ -315,19 +261,18 @@ void *user1_thread(void *threadarg){
 // the user thread is quivalent to computers on the two ends
 void *user2_thread(void *threadarg){
     
-    msgq_t *msgq = (msgq_t *) threadarg;
+    Msgq *msgq = (Msgq *) threadarg;
     int solving_flag = 0;
-    msg_t msgtemp;
+    Msg msgtemp;
     msgtemp.datatype = NOTSET;
     
-    int8_t idtype = INTARR;
-    int idlen = 5;
+    int idlen = 5 * sizeof(int);
     int * id = (int *)malloc(idlen);
-    id[0] = 0;
-    id[1] = 20;
-    id[2] = 48;
-    id[3] = 68;
-    id[4] = 87;
+    id[0] = 25;
+    id[1] = 40;
+    id[2] = 68;
+    id[3] = 88;
+    id[4] = 00;
     
     while(1){
         //if there is a request to solve, work on it
@@ -337,11 +282,11 @@ void *user2_thread(void *threadarg){
             msgtemp.req_or_resp = RESP;
             msgtemp.acked = UNACKED;
             if(msgtemp.type == IDTYPE){
-                if(msgtemp.data) delete[] (int*)msgtemp.data;
+                if(msgtemp.data) free(msgtemp.data);
                 msgtemp.data = malloc(idlen);
                 memcpy(msgtemp.data, id, idlen);
                 msgtemp.datalen = idlen;
-                msgtemp.datatype = idtype;
+                msgtemp.datatype = INTARR;
             }
             else if(msgtemp.type == HASHTYPE){
                 msgtemp.data = hash_func(msgtemp.data, msgtemp.datatype);
@@ -356,13 +301,7 @@ void *user2_thread(void *threadarg){
             // if the queue front is a request from peer
             // copy the request to local
             if(msgq->q.front().req_or_resp == REQ && msgq->q.front().sender == C1){
-                if(msgtemp.datatype == INTARR)
-                    delete[] (int*)msgtemp.data;
-                if(msgtemp.datatype == CHARARR)
-                    delete[] (char*)msgtemp.data;
                 msgtemp = msgq->q.front();
-                msgtemp.data = malloc(msgtemp.datalen);
-                memcpy(msgtemp.data, msgq->q.front().data, msgtemp.datalen);
                 msgq->q.pop();
                 solving_flag = 1;
             }
@@ -372,5 +311,4 @@ void *user2_thread(void *threadarg){
     }
     //pthread_exit(NULL);
     return NULL;
-
 }
