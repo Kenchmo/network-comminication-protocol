@@ -26,6 +26,7 @@ int main () {
     tempmsg1.acked = UNACKED;
     tempmsg1.datatype = INTARR;
     tempmsg1.type = IDTYPE;
+    tempmsg1.data = NULL;
     
     tempmsg2.sender = C1;
     tempmsg2.req_or_resp = REQ;
@@ -56,6 +57,7 @@ int main () {
     tempmsg.datatype = INTARR;
     tempmsg.acked = UNACKED;
     tempmsg.type = IDTYPE;
+    tempmsg.data = NULL;
     msgq2->q.push(tempmsg);
     
 

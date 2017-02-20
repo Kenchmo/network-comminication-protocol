@@ -18,6 +18,7 @@
 #include <queue>
 #include <iostream>
 #include <thread>
+#include <stack>
 
 
 #include "spinlock.h"
@@ -72,7 +73,8 @@ public:
         datatype = NOTSET;
     };
     ~Msg(){
-        if(data != NULL) free(data);
+        if(data != NULL)
+            free(data);
         data = NULL;
     };
     
@@ -125,12 +127,10 @@ class Server_class{
 public:
     
     spinlock lock;
-    Msg msg;
+    stack<Msg> msg;
     
     Server_class(){};
-    ~Server_class(){
-        if(msg.data != NULL) free(msg.data);
-    };
+    ~Server_class(){};
     Server_class & operator= (const Server_class & other){
         msg = other.msg;
         return *this;

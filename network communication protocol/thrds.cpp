@@ -19,9 +19,6 @@ volatile int notify_c2 = 0;
 
 void *server_thread(void *threadarg){
     //initialize Server_class
-    this_server.msg.sender = NOTSET;
-    this_server.msg.req_or_resp = NOTSET;
-    this_server.msg.acked = NOTSET;
     //int notified_flag = 0;
 
     //waiting for two clients to connect
@@ -79,44 +76,44 @@ void *client1_thread(void *threadarg) {
         
         /* see if there is msg for me */
         
-        if(this_server.msg.sender == C2 && this_server.msg.acked == UNACKED){
+        if(!this_server.msg.empty() &&this_server.msg.top().sender == C2 && this_server.msg.top().acked == UNACKED){
             
             // if the msg is a response, simply print it to screen
-            if(this_server.msg.req_or_resp == RESP){
-                if(this_server.msg.type == IDTYPE)
+            if(this_server.msg.top().req_or_resp == RESP){
+                if(this_server.msg.top().type == IDTYPE)
                     cout<<"CLIENT 2 RESP ID TO CLIENT 1: ";
-                else if(this_server.msg.type == HASHTYPE)
+                else if(this_server.msg.top().type == HASHTYPE)
                     cout<<"CLIENT 2 RESP HASH RESULT: ";
-                this_server.msg.print_data();
+                this_server.msg.top().print_data();
             }
             
             // if the msg is a request,
             // 1. print to screen
             // 2. push to the msg queue, waiting for the user to process
-            else if(this_server.msg.req_or_resp == REQ){
+            else if(this_server.msg.top().req_or_resp == REQ){
                 
-                if(this_server.msg.type == IDTYPE)
+                if(this_server.msg.top().type == IDTYPE)
                     cout<<"CLIENT 1 RECEIVED ID REQ FROM CLIENT 2 \n";
-                else if(this_server.msg.type == HASHTYPE)
+                else if(this_server.msg.top().type == HASHTYPE)
                     cout<<"CLIENT 1 RECEIVED HASH REQ FROM CLIENT 2 \n";
-                Msg msgtemp = this_server.msg;
+                Msg msgtemp = this_server.msg.top();
                 msgq->lock.lock();
                 msgq->q.push(msgtemp);
                 msgq->lock.unlock();
             }
             
-            this_server.msg.acked = ACKED;
+            this_server.msg.top().acked = ACKED;
         }
         
         /* if there is no msg for me , see if I need to send msg */
         
         else{
-            if(this_server.msg.acked == ACKED || this_server.msg.acked == NOTSET){
+            if(this_server.msg.empty() || (this_server.msg.top().acked == ACKED || this_server.msg.top().acked == NOTSET)){
                 
                 msgq->lock.lock();              //lock the msg queue
                 
                 if(msgq->q.size() != 0 && msgq->q.front().sender == C1){
-                    this_server.msg = msgq->q.front();
+                    this_server.msg.push(msgq->q.front());
                     msgq->q.pop();
                 }
                 msgq->lock.unlock();
@@ -151,44 +148,43 @@ void *client2_thread(void *threadarg){
         
         /* see if there is msg for me */
         
-        if(this_server.msg.sender == C1 && this_server.msg.acked == UNACKED){
+        if(!this_server.msg.empty() && this_server.msg.top().sender == C1 && this_server.msg.top().acked == UNACKED){
             
             // if the msg is a response, simply print it to screen
-            if(this_server.msg.req_or_resp == RESP){
-                if(this_server.msg.type == IDTYPE)
+            if(this_server.msg.top().req_or_resp == RESP){
+                if(this_server.msg.top().type == IDTYPE)
                     cout<<"CLIENT 1 RESP ID TO CLIENT 2: ";
-                else if(this_server.msg.type == HASHTYPE)
+                else if(this_server.msg.top().type == HASHTYPE)
                     cout<<"CLIENT 1 RESP HASH RESULT: ";
-                this_server.msg.print_data();
+                this_server.msg.top().print_data();
             }
             
             // if the msg is a request,
             // 1. print to screen
             // 2. push to the msg queue, waiting for the user to process
-            else if(this_server.msg.req_or_resp == REQ){
+            else if(this_server.msg.top().req_or_resp == REQ){
                 
-                if(this_server.msg.type == IDTYPE)
+                if(this_server.msg.top().type == IDTYPE)
                     cout<<"CLIENT 2 RECEIVED ID REQ FROM CLIENT 1 \n";
-                else if(this_server.msg.type == HASHTYPE)
+                else if(this_server.msg.top().type == HASHTYPE)
                     cout<<"CLIENT 2 RECEIVED HASH REQ FROM CLIENT 1 \n";
-                Msg msgtemp = this_server.msg;
+                Msg msgtemp = this_server.msg.top();
                 msgq->lock.lock();
                 msgq->q.push(msgtemp);
                 msgq->lock.unlock();
             }
             
-            this_server.msg.acked = ACKED;
+            this_server.msg.top().acked = ACKED;
         }
         
         /* if there is no msg for me , see if I need to send msg */
         
         else{
-            if(this_server.msg.acked == ACKED || this_server.msg.acked == NOTSET){
+            if(this_server.msg.empty() || (this_server.msg.top().acked == ACKED || this_server.msg.top().acked == NOTSET)){
                 
                 msgq->lock.lock();              //lock the msg queue
-                
                 if(msgq->q.size() != 0 && msgq->q.front().sender == C2){
-                    this_server.msg = msgq->q.front();
+                    this_server.msg.push(msgq->q.front());
                     msgq->q.pop();
                 }
                 msgq->lock.unlock();
