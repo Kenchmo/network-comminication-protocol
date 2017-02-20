@@ -2,8 +2,6 @@
 //  thrds.h
 //  network communication protocol
 //
-//  Created by Enkhjargalyn Nyam-Ochir on 2/18/17.
-//  Copyright © 2017 Lufan Zhou. All rights reserved.
 //
 
 #ifndef thrds_h

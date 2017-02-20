@@ -12,10 +12,12 @@ using namespace std;
 extern Server_class this_server;
 extern Msgq * msgq1, * msgq2;
 
-int client1_connected = 0;
-int client2_connected = 0;
+int8_t client1_connected = 0;
+int8_t client2_connected = 0;
 volatile int notify_c1 = 0;
 volatile int notify_c2 = 0;
+
+/* deleted server thread because the server is literally a msg box (as declared as this_server above)*/
 
 //void *server_thread(void *threadarg){
 //    //initialize Server_class
@@ -55,7 +57,7 @@ volatile int notify_c2 = 0;
 
 
 
-/**
+/** client thread
  * INPUT: void* threadarg, the task queue
  * EFFECTS: sending the task to the other client through the Server_class
  *          receiving the response from the other client through the sever
@@ -126,7 +128,7 @@ void *client1_thread(void *threadarg) {
 
 
 
-/**
+/** client thread
  * INPUT: void* threadarg, the task queue
  * EFFECTS: sending the task to the other client through the Server_class
  *          receiving the response from the other client through the sever
@@ -195,7 +197,11 @@ void *client2_thread(void *threadarg){
 
 
 }
-
+/** user thread
+  * INPUT: void * threadarg: the pointer to the msg queue
+  * EFFECTS: 1. put the incoming requests to the msg queue
+  *          2. deal the the requests from peer and put the answer to the msg queue
+ **/
 
 void *user1_thread(void *threadarg){
     Msgq *msgq = (Msgq *) threadarg;
@@ -254,7 +260,12 @@ void *user1_thread(void *threadarg){
     return NULL;
 }
 
-// the user thread is quivalent to computers on the two ends
+
+/** user thread
+ * INPUT: void * threadarg: the pointer to the msg queue
+ * EFFECTS: 1. put the incoming requests to the msg queue
+ *          2. deal the the requests from peer and put the answer to the msg queue
+ **/
 void *user2_thread(void *threadarg){
     
     Msgq *msgq = (Msgq *) threadarg;

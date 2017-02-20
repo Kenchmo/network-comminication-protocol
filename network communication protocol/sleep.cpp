@@ -1,7 +1,7 @@
 //
 //  sleep.cpp
 //  network communication protocol
-//
+// Reference: http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds
 //
 
 #include "sleep.h"

@@ -1,3 +1,14 @@
+
+/** Network Communication Protocol
+ *
+ *
+ *
+ *
+ *
+ *
+ **/
+
+
 #include "thrds.h"
 #include <iostream>
 #include <cstdlib>
@@ -8,9 +19,11 @@
 
 using namespace std;
 
-pthread_t server_trd;
+//pthread_t server_trd;
 pthread_t client1_trd, client2_trd;
 pthread_t user1_trd, user2_trd;
+
+// the server is just a message box
 Server_class this_server;
 
 Msgq * msgq1, * msgq2;
@@ -21,6 +34,7 @@ int main () {
     Msg tempmsg1, tempmsg2;// tempmsg3, tempmsg4;
     Msg tempmsg;
 
+    /* the trivial inputs to make the code run in the fisrt request and response round*/
     tempmsg1.sender = C1;
     tempmsg1.req_or_resp = REQ;
     tempmsg1.acked = UNACKED;
@@ -65,18 +79,11 @@ int main () {
 
     int rc;
     
-//    /*server thread */
-//    
-//    cout <<"main() : creating Server_class thread " << endl;
-//    rc = pthread_create(&server_trd, NULL, server_thread, (void *)NULL);
-//    if (rc){
-//        cout << "Error: unable to create thread," << rc << endl;
-//        exit(-1);
-//    }
+
     
     /*network client threads */
     
-    sleep(2);
+    //sleep(2);
     cout <<"main() : creating client1 thread " << endl;
     rc = pthread_create(&client1_trd, NULL, client1_thread, (void *)msgq1);
     if (rc){
@@ -91,7 +98,13 @@ int main () {
         exit(-1);
     }
     
-    /* human threads */
+    /* human threads
+     * the human threads are supposed to take in the input requests and put them on the msg queue
+     * this code is highly unstable, so the trivial inputs are given at the begining of the main function 
+     * To be implemented: in order to simulate real time input from human, the human thread needs to read from
+     * a request sending schedule, and set up a clock, putting the requst to msgq according to the clock.
+     */
+    
     cout <<"main() : creating user1 thread " << endl;
     rc = pthread_create(&user1_trd, NULL, user1_thread, (void *)msgq1);
     if (rc){

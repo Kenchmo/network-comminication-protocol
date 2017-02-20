@@ -7,8 +7,7 @@
 #include "hash.h"
 
 
-// These are two dummy hashing fuctions
-//
+// These are two dummy hashing fuctions to test request hashing action
 
 int hash_func(void * hasharg, size_t datalen, int8_t hash_method){
     if(hash_method == HASHING1) return hashing1(hasharg, datalen);
