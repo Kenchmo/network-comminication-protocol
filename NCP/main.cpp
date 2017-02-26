@@ -23,53 +23,9 @@ Server_class this_server;
 Msgq * msgq1, * msgq2;
 
 int main () {
-    msgq1 = new Msgq;
-    msgq2 = new Msgq;
-    Msg tempmsg1, tempmsg2;// tempmsg3, tempmsg4;
-    Msg tempmsg;
 
-    /* the trivial inputs to make the code run in the fisrt request and response round*/
-    tempmsg1.sender = C1;
-    tempmsg1.req_or_resp = REQ;
-    tempmsg1.acked = UNACKED;
-    tempmsg1.datatype = INTARR;
-    tempmsg1.type = IDTYPE;
-    tempmsg1.data = NULL;
     
-    tempmsg2.sender = C1;
-    tempmsg2.req_or_resp = REQ;
-    tempmsg2.acked = UNACKED;
-    tempmsg2.datatype = INTARR;
-    tempmsg2.type = HASHTYPE;
-    tempmsg2.data = malloc(sizeof(int));
-    tempmsg2.datalen = sizeof(int);
-    
-    msgq1->q.push_back(tempmsg1);
-    msgq1->q.push_back(tempmsg2);
-    //msgq1->q.push(&tempmsg3);
-    //msgq1->q.push(&tempmsg4);
-    
-//    tempmsg.sender = C1;
-//    tempmsg.req_or_resp = REQ;
-//    tempmsg.acked = UNACKED;
-//    tempmsg.datatype = INTARR;
-//    tempmsg.type = HASHTYPE;
-//    tempmsg.data = malloc(10*sizeof(int));
-//    for(int i = 0; i < 10; i++)
-//        ((int*)tempmsg.data)[i] = i;
-//    tempmsg.datalen = 10;
-//    msgq1->q.push(tempmsg);
-    
-    tempmsg.sender = C2;
-    tempmsg.req_or_resp = REQ;
-    tempmsg.datatype = INTARR;
-    tempmsg.acked = UNACKED;
-    tempmsg.type = IDTYPE;
-    tempmsg.data = NULL;
-    tempmsg.hashtype = HASHING2;
-    msgq2->q.push_back(tempmsg);
-    
-
+    /* to be implemented, the request message parser*/
 
     int rc;
     
