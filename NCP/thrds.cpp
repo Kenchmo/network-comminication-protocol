@@ -19,42 +19,6 @@ volatile int notify_c2 = 0;
 
 /* deleted server thread because the server is literally a msg box (as declared as this_server above)*/
 
-//void *server_thread(void *threadarg){
-//    //initialize Server_class
-//    //int notified_flag = 0;
-//
-//    //waiting for two clients to connect
-//    while(1){
-//        if(client1_connected && client2_connected){
-//            //cout<<"client 1 & 2 connected \n";
-//            break;
-//        }
-//    }
-//    
-//    //start processing requests and responses
-//    while(1){
-////        //if Server_class has unacknowledged msg
-////        if(this_server.msg.acked == UNACKED && notified_flag == 0){
-////            this_server.lock.lock();
-////            if(this_server.msg.sender == C1){
-////                notify_c2 = 1; //notify c2
-////                cout<<"notified c2 \n";
-////                //wait until c2 put the notify flag down
-////                while(notify_c2){}
-////            }
-////            if(this_server.msg.sender == C2){
-////                cout<<"notifying c1 \n";
-////                notify_c1 = 1; //notify c2
-////                //wait until c1 put the notify flag down
-////                while(notify_c1){}
-////            }
-////            this_server.lock.unlock();
-////        }
-//    }
-//    //pthread_exit(NULL);
-//    return NULL;
-//}
-
 
 
 /** client thread

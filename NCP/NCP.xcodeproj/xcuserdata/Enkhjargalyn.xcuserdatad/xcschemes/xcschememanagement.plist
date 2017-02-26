@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>network communication protocol.xcscheme</key>
+		<key>NCP.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,7 +12,7 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>6DF4BB0E1E5A3A9A0014AA8D</key>
+		<key>6D0C4B4E1E6283F400C89CCD</key>
 		<dict>
 			<key>primary</key>
 			<true/>

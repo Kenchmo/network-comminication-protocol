@@ -74,7 +74,7 @@ public:
     };
     ~Msg(){
         if(data != NULL)
-            free(data);
+            delete[] data;
         data = NULL;
     };
     
@@ -84,11 +84,11 @@ public:
         acked = other.acked;
         type = other.type;
         if(data != NULL){
-            free(data);
+           delete[] data;
             data = NULL;
         }
         if(other.data != NULL){
-            data = malloc(other.datalen);
+            data = new int[other.datalen];
             datalen = other.datalen;
             memcpy(data, other.data, datalen);
             datatype = other.datatype;

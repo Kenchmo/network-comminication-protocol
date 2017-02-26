@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6DF4BB0E1E5A3A9A0014AA8D"
-               BuildableName = "network communication protocol"
-               BlueprintName = "network communication protocol"
-               ReferencedContainer = "container:network communication protocol.xcodeproj">
+               BlueprintIdentifier = "6D0C4B4E1E6283F400C89CCD"
+               BuildableName = "NCP"
+               BlueprintName = "NCP"
+               ReferencedContainer = "container:NCP.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6DF4BB0E1E5A3A9A0014AA8D"
-            BuildableName = "network communication protocol"
-            BlueprintName = "network communication protocol"
-            ReferencedContainer = "container:network communication protocol.xcodeproj">
+            BlueprintIdentifier = "6D0C4B4E1E6283F400C89CCD"
+            BuildableName = "NCP"
+            BlueprintName = "NCP"
+            ReferencedContainer = "container:NCP.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -55,10 +55,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6DF4BB0E1E5A3A9A0014AA8D"
-            BuildableName = "network communication protocol"
-            BlueprintName = "network communication protocol"
-            ReferencedContainer = "container:network communication protocol.xcodeproj">
+            BlueprintIdentifier = "6D0C4B4E1E6283F400C89CCD"
+            BuildableName = "NCP"
+            BlueprintName = "NCP"
+            ReferencedContainer = "container:NCP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -74,10 +74,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6DF4BB0E1E5A3A9A0014AA8D"
-            BuildableName = "network communication protocol"
-            BlueprintName = "network communication protocol"
-            ReferencedContainer = "container:network communication protocol.xcodeproj">
+            BlueprintIdentifier = "6D0C4B4E1E6283F400C89CCD"
+            BuildableName = "NCP"
+            BlueprintName = "NCP"
+            ReferencedContainer = "container:NCP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

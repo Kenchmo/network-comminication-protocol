@@ -1,12 +1,6 @@
 
-/** Network Communication Protocol
- *
- *
- *
- *
- *
- *
- **/
+/** Network Communication Protocol **/
+
 
 
 #include "thrds.h"
