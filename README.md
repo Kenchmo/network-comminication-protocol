@@ -1,18 +1,21 @@
 # network-comminication-protocol
 
-1. Request peer ID
+Request peer ID
 
 In this request, a peer asks its remote to respond with an (assumedly) unique
 
 ID in the form of a variable length string of characters.
 
-2. Request Hash
+
+
+Request Hash
 
 In this request, a peer sends a block of data and one of a set of hash
 
 functions. The peer must calculate the hash of the data, and then respond
 
 with the resultant hash.
+
 
 
 A sample output 
